@@ -18,7 +18,7 @@ diffeq = (expected, actual) ->
 
 module.exports =
   'test building basic XML structure': (test) ->
-    expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xml><Label></Label><MsgId>5850440872586764820</MsgId></xml>'
+    expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xml><Label/><MsgId>5850440872586764820</MsgId></xml>'
     obj = {"xml":{"Label":[""],"MsgId":["5850440872586764820"]}}
     builder = new xml2js.Builder renderOpts: pretty: false
     actual = builder.buildObject obj
@@ -80,6 +80,23 @@ module.exports =
     diffeq expected, actual
     test.finish()
 
+  'test allowSurrogateChars option': (test) ->
+    expected = """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xml>
+          <MsgId>\uD83D\uDC33</MsgId>
+      </xml>
+
+    """
+    opts =
+      renderOpts: pretty: true, indent: '    '
+      allowSurrogateChars: true
+    builder = new xml2js.Builder opts
+    obj = {"xml":{"MsgId":["\uD83D\uDC33"]}}
+    actual = builder.buildObject obj
+    diffeq expected, actual
+    test.finish()
+
   'test explicit rootName is always used: 1. when there is only one element': (test) ->
     expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><FOO><MsgId>5850440872586764820</MsgId></FOO>'
     opts = renderOpts: {pretty: false}, rootName: 'FOO'
@@ -126,3 +143,109 @@ module.exports =
         xmlActual = builder.buildObject obj
         diffeq xmlExpected, xmlActual
         test.finish()
+
+  'test building obj with undefined value' : (test) ->
+    obj = { node: 'string', anothernode: undefined }
+    builder = new xml2js.Builder renderOpts: { pretty: false }
+    actual = builder.buildObject(obj);
+    expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root><node>string</node><anothernode/></root>'
+    equ actual, expected
+    test.finish();
+
+  'test building obj with null value' : (test) ->
+    obj = { node: 'string', anothernode: null }
+    builder = new xml2js.Builder renderOpts: { pretty: false }
+    actual = builder.buildObject(obj);
+    expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root><node>string</node><anothernode/></root>'
+    equ actual, expected
+    test.finish();
+
+  'test escapes escaped characters': (test) ->
+    expected = """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xml>
+        <MsgId>&amp;amp;&amp;lt;&amp;gt;</MsgId>
+      </xml>
+
+    """
+    builder = new xml2js.Builder
+    obj = {"xml":{"MsgId":["&amp;&lt;&gt;"]}}
+    actual = builder.buildObject obj
+    diffeq expected, actual
+    test.finish()
+
+  'test cdata text nodes': (test) ->
+    expected = """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xml>
+        <MsgId><![CDATA[& <<]]></MsgId>
+      </xml>
+
+    """
+    opts = cdata: true
+    builder = new xml2js.Builder opts
+    obj = {"xml":{"MsgId":["& <<"]}}
+    actual = builder.buildObject obj
+    diffeq expected, actual
+    test.finish()
+
+  'test cdata text nodes with escaped end sequence': (test) ->
+    expected = """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xml>
+        <MsgId><![CDATA[& <<]]]]><![CDATA[>]]></MsgId>
+      </xml>
+
+    """
+    opts = cdata: true
+    builder = new xml2js.Builder opts
+    obj = {"xml":{"MsgId":["& <<]]>"]}}
+    actual = builder.buildObject obj
+    diffeq expected, actual
+    test.finish()
+
+  'test uses cdata only for chars &, <, >': (test) ->
+    expected = """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xml>
+        <MsgId><![CDATA[& <<]]></MsgId>
+        <Message>Hello</Message>
+      </xml>
+
+    """
+    opts = cdata: true
+    builder = new xml2js.Builder opts
+    obj = {"xml":{"MsgId":["& <<"],"Message":["Hello"]}}
+    actual = builder.buildObject obj
+    diffeq expected, actual
+    test.finish()
+
+  'test uses cdata for string values of objects': (test) ->
+    expected = """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xml>
+        <MsgId><![CDATA[& <<]]></MsgId>
+      </xml>
+
+    """
+    opts = cdata: true
+    builder = new xml2js.Builder opts
+    obj = {"xml":{"MsgId":"& <<"}}
+    actual = builder.buildObject obj
+    diffeq expected, actual
+    test.finish()
+
+  'test does not error on non string values when checking for cdata': (test) ->
+    expected = """
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xml>
+        <MsgId>10</MsgId>
+      </xml>
+
+    """
+    opts = cdata: true
+    builder = new xml2js.Builder opts
+    obj = {"xml":{"MsgId":10}}
+    actual = builder.buildObject obj
+    diffeq expected, actual
+    test.finish()

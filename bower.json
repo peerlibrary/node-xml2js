@@ -6,9 +6,8 @@
     "json"
   ],
   "homepage": "https://github.com/Leonidas-from-XIV/node-xml2js",
-  "version": "0.4.16",
-  "author": "Marek Kubica <marek@xivilization.net> (https://xivilization.net)",
-  "contributors": [
+  "main": "./lib/xml2js",
+  "authors": [
     "maqr <maqr.lollerskates@gmail.com> (https://github.com/maqr)",
     "Ben Weaver (http://benweaver.com/)",
     "Jae Kwon (https://github.com/jaekwon)",
@@ -47,38 +46,34 @@
     "Stephen Cresswell (https://github.com/cressie176)",
     "Pascal Ehlert <pascal@hacksrus.net> (http://www.hacksrus.net/)",
     "Tom Spencer <fiznool@gmail.com> (http://fiznool.com/)",
-    "Tristian Flanagan <tflanagan@datacollaborative.com> (https://github.com/tflanagan)",
-    "Tim Johns <timjohns@yahoo.com> (https://github.com/TimJohns)",
-    "Bogdan Chadkin <trysound@yandex.ru> (https://github.com/TrySound)",
-    "David Wood <david.p.wood@gmail.com> (http://codesleuth.co.uk/)"
+    "Tristian Flanagan <tflanagan@datacollaborative.com> (https://github.com/tflanagan)"
   ],
-  "main": "./lib/xml2js",
-  "files": [
-    "lib"
+  "license": "MIT",
+  "moduleType": [
+    "node"
   ],
-  "directories": {
-    "lib": "./lib"
-  },
-  "scripts": {
-    "test": "zap",
-    "coverage": "nyc npm test && nyc report",
-    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Leonidas-from-XIV/node-xml2js.git"
   },
   "dependencies": {
-    "sax": ">=0.6.0",
-    "xmlbuilder": "^4.1.0"
+    "sax": "isaacs/sax-js",
+    "xmlbuilder": "oozcitak/xmlbuilder-js"
   },
   "devDependencies": {
     "coffee-script": ">=1.10.0",
-    "coveralls": "^2.11.2",
-    "diff": ">=1.0.8",
-    "docco": ">=0.6.2",
-    "nyc": ">=2.2.1",
-    "zap": ">=0.2.9"
+    "coveralls": "nickmerwin/node-coveralls",
+    "diff": "kpdecker/jsdiff",
+    "docco": "jashkenas/docco",
+    "nyc": "bcoe/nyc",
+    "zap": "nornagon/node-zap"
   },
-  "license": "MIT"
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "src"
+  ],
+  "private": false
 }

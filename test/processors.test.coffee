@@ -26,3 +26,23 @@ module.exports =
     result = processors.stripPrefix demo
     equ result, 'xmlns:shouldHavePrefix'
     test.done()
+
+  'test parseNumbers': (test) ->
+    equ processors.parseNumbers('0'), 0
+    equ processors.parseNumbers('123'), 123
+    equ processors.parseNumbers('15.56'), 15.56
+    equ processors.parseNumbers('10.00'), 10
+    test.done()
+
+  'test parseBooleans': (test) ->
+    equ processors.parseBooleans('true'), true
+    equ processors.parseBooleans('True'), true
+    equ processors.parseBooleans('TRUE'), true
+    equ processors.parseBooleans('false'), false
+    equ processors.parseBooleans('False'), false
+    equ processors.parseBooleans('FALSE'), false
+    equ processors.parseBooleans('truex'), 'truex'
+    equ processors.parseBooleans('xtrue'), 'xtrue'
+    equ processors.parseBooleans('x'), 'x'
+    equ processors.parseBooleans(''), ''
+    test.done()
